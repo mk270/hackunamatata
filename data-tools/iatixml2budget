@@ -31,16 +31,29 @@ def tuple_of_elt(elt):
     recipient_cntry = by_name('recipient-country')
     rec_code        = elt.find('recipient-country').attrib['code']
 
-    return (
-        title,
-        reporting_org,
-        iati_identifier,
-        sector_code,
-        sector,
-        start_actual,
-        end_actual,
-        recipient_cntry,
-        rec_code
+    location        = elt.find('location')
+    pos             = location.xpath('//pos')[0].text
+
+    budgets = elt.findall('budget')
+
+    for budget in budgets:
+        value = budget.find('value')
+        value_date = value.attrib['value-date']
+        value_amount = value.text
+
+        yield (
+            title,
+            reporting_org,
+            iati_identifier,
+            sector_code,
+            sector,
+            start_actual,
+            end_actual,
+            recipient_cntry,
+            rec_code,
+            pos,
+            value_date,
+            value_amount
         )
 
 def run():
@@ -49,8 +62,8 @@ def run():
     w = csv.writer(sys.stdout)
 
     for elt in root.xpath('//iati-activity'):
-        row = tuple_of_elt(elt)
-        w.writerow(row)
+        for row in tuple_of_elt(elt):
+            w.writerow(row)
         
 if __name__ == '__main__':
     run()
