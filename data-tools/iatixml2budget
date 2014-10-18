@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Takes an IATI XML file on stdin; outputs CSV of data relevant to the budget
+
 import sys
 import lxml.etree
 import csv
