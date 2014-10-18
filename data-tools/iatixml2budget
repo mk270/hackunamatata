@@ -4,7 +4,7 @@
 
 import sys
 import lxml.etree
-import csv
+import unicodecsv
 
 def tuple_of_elt(elt):
     def by_name(name): return elt.find(name).text
@@ -12,8 +12,13 @@ def tuple_of_elt(elt):
     title           = by_name("title")
     reporting_org   = by_name("reporting-org")
     iati_identifier = by_name("iati-identifier")
-    sector          = by_name("sector")
-    sector_code     = elt.find("sector").attrib['code']
+
+    if elt.find("sector") is not None:
+        sector          = by_name("sector")
+        sector_code     = elt.find("sector").attrib['code']
+    else:
+        sector          = None
+        sector_code     = None
 
     def get_dates():
         activity_dates = elt.findall('activity-date')
@@ -28,11 +33,19 @@ def tuple_of_elt(elt):
     start_planned   = activity_dates["start-planned"]
     end_actual      = activity_dates["end-actual"]
     end_planned     = activity_dates["end-planned"]
-    recipient_cntry = by_name('recipient-country')
-    rec_code        = elt.find('recipient-country').attrib['code']
+
+    if elt.find("recipient-country") is not None:
+        recipient_cntry = by_name('recipient-country')
+        rec_code        = elt.find('recipient-country').attrib['code']
+    else:
+        recipient_cntry = None
+        rec_code        = None
 
     location        = elt.find('location')
-    pos             = location.xpath('//pos')[0].text
+    if location is not None and location.xpath('//pos'):        
+        pos             = location.xpath('//pos')[0].text
+    else:
+        pos             = None
 
     budgets = elt.findall('budget')
 
@@ -59,7 +72,7 @@ def tuple_of_elt(elt):
 def run():
     root = lxml.etree.parse(sys.stdin)
 
-    w = csv.writer(sys.stdout)
+    w = unicodecsv.writer(sys.stdout)
 
     for elt in root.xpath('//iati-activity'):
         for row in tuple_of_elt(elt):
