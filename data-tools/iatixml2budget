@@ -24,9 +24,13 @@ def tuple_of_elt(elt):
         activity_dates = elt.findall('activity-date')
         for ad in activity_dates:
             ty = ad.attrib['type']
-            iso_date = ad.attrib['iso-date']
-            yield (ty, iso_date)
-    
+            try:
+                iso_date = ad.attrib['iso-date']
+                yield (ty, iso_date)
+            except KeyError:
+                #print "missing iso-date in ", ad.attrib, iati_identifier
+                #raise
+                yield (ty, None)
     activity_dates = dict(get_dates())
 
     start_actual    = activity_dates["start-actual"]
@@ -69,10 +73,17 @@ def tuple_of_elt(elt):
             value_amount
         )
 
+titles = ["Title", "Reporting Org", "IATI Identifier",
+          "Sector Code", "Sector", "Start actual", "End actual",
+          "Recipient Country", "Recipient Country Code", "Position",
+          "Value Date", "Value Amount"]
+
 def run():
     root = lxml.etree.parse(sys.stdin)
 
     w = unicodecsv.writer(sys.stdout)
+
+    w.writerow(titles)
 
     for elt in root.xpath('//iati-activity'):
         for row in tuple_of_elt(elt):
