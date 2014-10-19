@@ -33,10 +33,10 @@ def tuple_of_elt(elt):
                 yield (ty, None)
     activity_dates = dict(get_dates())
 
-    start_actual    = activity_dates["start-actual"]
-    start_planned   = activity_dates["start-planned"]
-    end_actual      = activity_dates["end-actual"]
-    end_planned     = activity_dates["end-planned"]
+    start_actual    = activity_dates.get("start-actual", None)
+    start_planned   = activity_dates.get("start-planned", None)
+    end_actual      = activity_dates.get("end-actual", None)
+    end_planned     = activity_dates.get("end-planned", None)
 
     if elt.find("recipient-country") is not None:
         recipient_cntry = by_name('recipient-country')
