@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -eu
+
+DIR=/var/tmp/iati
+
+files () {
+	ls -Sr $DIR/*-{uga,uganda,ug,cd,cod,congo,rw,rwa,rwanda,bi,bdi,burundi}.xml
+}
+
+for x in $(files)
+do
+	./iatixml2budget < $x > /tmp/$(basename ${x}).csv
+done
